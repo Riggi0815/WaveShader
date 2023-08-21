@@ -6,6 +6,9 @@ Shader "Custom/Waves"
         _MainTex ("Albedo (RGB)", 2D) = "white" {}
         _Glossiness ("Smoothness", Range(0,1)) = 0.5
         _Metallic ("Metallic", Range(0,1)) = 0.0
+        _Amplitude ("Amplitude", Float) = 1
+        _Wavelength ("Wavelength", Float) = 10
+        _Speed("Speed", Float) = 1
     }
     SubShader
     {
@@ -30,6 +33,7 @@ Shader "Custom/Waves"
         half _Glossiness;
         half _Metallic;
         fixed4 _Color;
+        float _Amplitude, _Wavelength, _Speed;
 
         // Add instancing support for this shader. You need to check 'Enable Instancing' on materials that use the shader.
         // See https://docs.unity3d.com/Manual/GPUInstancing.html for more information about instancing.
@@ -43,7 +47,10 @@ Shader "Custom/Waves"
         void vert(inout appdata_full vertexData)
         {
             float3 p = vertexData.vertex.xyz; //Original Position of the Vertex
-            p.y = sin(p.x); //y = sin x for simple Wave
+
+            float k = 2 * UNITY_PI / _Wavelength;
+            p.y = _Amplitude * sin(k * (p.x - _Speed * _Time.y)); 
+
             vertexData.vertex.xyz = p;
         }
 
