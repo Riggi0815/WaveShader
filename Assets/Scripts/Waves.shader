@@ -18,7 +18,7 @@ Shader "Custom/Waves"
         CGPROGRAM
         // Physically based Standard lighting model, and enable shadows on all light types
         //Surface Shader also uses vertex function
-        #pragma surface surf Standard fullforwardshadows vertex:vert
+        #pragma surface surf Standard fullforwardshadows vertex:vert addshadow
 
         // Use shader model 3.0 target, to get nicer looking lighting
         #pragma target 3.0
@@ -48,10 +48,15 @@ Shader "Custom/Waves"
         {
             float3 p = vertexData.vertex.xyz; //Original Position of the Vertex
 
-            float k = 2 * UNITY_PI / _Wavelength;
-            p.y = _Amplitude * sin(k * (p.x - _Speed * _Time.y)); 
+            float k = 2 * UNITY_PI / _Wavelength; //k =  wavenumber
+            float f = k * (p.x - _Speed *_Time.y);//for tangent Vector Calculations
+            p.y = _Amplitude * sin(f); //Amplitude and Wave
+
+            float3 tangent = normalize(float3(1, k * _Amplitude * cos(f), 0)); // normalize Tangent Vector
+            float3 normal = float3(-tangent.y, tangent.x, 0); // Normal Vector
 
             vertexData.vertex.xyz = p;
+            vertexData.normal = normal;
         }
 
         void surf (Input IN, inout SurfaceOutputStandard o)
